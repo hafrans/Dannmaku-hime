@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>updated on 2016-08-12</comment>
+<entry key="font-face">微软雅黑 Light</entry>
+<entry key="updated">2016-08-12</entry>
+<entry key="server-address">http://api.hafrans.com/barrage/api.php?action=gettext&amp;privilege=public</entry>
+<entry key="text-size">52</entry>
+<entry key="heartbeat">3</entry>
+</properties>
