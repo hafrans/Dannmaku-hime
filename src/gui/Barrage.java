@@ -15,13 +15,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import utils.ProgramUtils;
 import utils.ScreenUtils;
 
-public class Barrage extends JFrame {
+public class Barrage extends JWindow {
 	private Dimension screenSize = ScreenUtils.getScreenSize();
-	private double screenPercent = 0.75;
+	private double screenPercent = 0.5; //屏占比
 	private final ConcurrentLinkedQueue<Integer> clq = new ConcurrentLinkedQueue<Integer>();
 	private int queueMaxSize = 3;
 	private int step = 3;
@@ -43,11 +44,11 @@ public class Barrage extends JFrame {
 
 	/**
 	 * Just For Debug
-	 * @param queueMaxSize
-	 * @param step
-	 * @param textSize
-	 * @param refreshTime
-	 * @param stepTime
+	 * @param queueMaxSize 5
+	 * @param step  8 6
+	 * @param textSize 48 52
+	 * @param refreshTime 
+	 * @param stepTime 32 36
 	 * @param pushTime
 	 */
 	public Barrage(int queueMaxSize, int step, int textSize, int refreshTime, int stepTime,int pushTime,String fontface) {
@@ -61,6 +62,7 @@ public class Barrage extends JFrame {
 		this.pushTime = pushTime;
 		this.fontface = fontface;
 		mBarrage();
+		this.setVisible(true);
 
 	}
 
@@ -69,42 +71,15 @@ public class Barrage extends JFrame {
 	}
 
 	public void mBarrage() {
-		this.setUndecorated(true);
+		//this.setUndecorated(true);
 		this.setBackground(new Color(0, 0, 0, 0));
 		this.setLayout(null);
 		this.setSize(screenSize.width, (int) (screenSize.height * screenPercent));
-		this.setFocusable(true);
-		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		this.setFocusable(false);
+		//this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.setAlwaysOnTop(true);
 		this.setLocation(0, 25);
-//		this.addKeyListener(new KeyAdapter() {
-//
-//			@Override
-//			public void keyReleased(KeyEvent e) {
-//				if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-//					Barrage.this.dispose();
-//					if (e.isShiftDown()) {
-//						System.err.println("强制退出");
-//						System.exit(-2);
-//					}
-//				}
-//				super.keyReleased(e);
-//			}
-//
-//		});
 
-		this.setVisible(true);
-		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
-			
-			@Override
-			public void eventDispatched(AWTEvent event) {
-					KeyEvent keyevent = (KeyEvent) event;
-					if(keyevent.getID()  == KeyEvent.KEY_RELEASED){
-						System.out.println("松开"+System.currentTimeMillis());
-					}
-				
-			}
-		}, AWTEvent.KEY_EVENT_MASK);
 
 		// 后台刷新线程
 		new Thread(new Runnable() {
@@ -113,10 +88,8 @@ public class Barrage extends JFrame {
 			public void run() {
 				try {
 					while (Barrage.this.isVisible()) {
-						TimeUnit.MILLISECONDS.sleep(refreshTime);
+						TimeUnit.SECONDS.sleep(10);
 						Barrage.this.repaint(1, 0, 0, Barrage.this.getWidth(), Barrage.this.getHeight());
-						// Barrage.this.setVisible(true);
-						// System.out.println("刷新");
 					}
 
 				} catch (InterruptedException e) {
@@ -132,10 +105,19 @@ public class Barrage extends JFrame {
 			public void run() {
 				try {
 					while (Barrage.this.isVisible()) {
-						if (clq.size() > queueMaxSize) {
+						if (clq.size() > queueMaxSize*0.8) {
 							clq.poll();
+							clq.poll();
+							/**	
+							 * 弹幕炸锅了
+							 */
+							if (clq.size() > queueMaxSize*2) {
+								clq.clear();
+								System.out.println("clear");
+							} 
 						} else {
-							TimeUnit.SECONDS.sleep(1);
+							
+							TimeUnit.MILLISECONDS.sleep(1000);
 						}
 					}
 				} catch (Exception e) {
@@ -148,13 +130,17 @@ public class Barrage extends JFrame {
 	}
 
 	private void write() {
+		
+		
+		
+		
 		new Timer().schedule(new TimerTask() {
 
 			@Override
 			public void run() {
 				if (Barrage.this.isVisible()) {
 					writeBarrage("测试文本--用于压力测试", fontface, String.valueOf(textSize));
-					//System.out.println("测试");
+					System.out.println("测试");
 				}
 			}
 		}, 500, pushTime);
@@ -178,6 +164,7 @@ public class Barrage extends JFrame {
 
 					@Override
 					public void run() {
+						boolean set = false;
 						while (label.getLocation().getX() > -label.getWidth() && Barrage.this.isVisible()) {
 							SwingUtilities.invokeLater(new Runnable() {
 
@@ -193,8 +180,12 @@ public class Barrage extends JFrame {
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}
+							if(!set && label.getLocation().x < screenSize.getWidth() - (Integer.parseInt(size) * text.length() + 10)){
+								clq.remove(label.getLocation().y);
+								set = true;
+							}
 						}
-						clq.remove(label.getLocation().y);
+						//clq.remove(label.getLocation().y);
 					}
 				}).start();
 
@@ -204,18 +195,20 @@ public class Barrage extends JFrame {
 
 	private int getRandomScreenYPosition(String size) {
 		int numSize = (int) (Integer.parseInt(size)*1.2);
-		int numLine = (int) (screenSize.height * screenPercent * 0.9) / numSize;
+		int numLine = (int) (screenSize.height * screenPercent) / numSize;
 		int random = 0;
+		
 		do {
 			random = new Random(System.currentTimeMillis()).nextInt(numLine) * numSize + 8;
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(800);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 
 		} while (clq.contains(random) && Barrage.this.isVisible());
 		clq.add(random);
+		
 
 		return random;
 

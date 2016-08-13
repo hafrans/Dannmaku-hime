@@ -38,7 +38,11 @@ public class main {
 				pro.setProperty("server-address", "http://api.hafrans.com/api.php?action=barrage");
 				pro.setProperty("heartbeat", "3");
 				pro.setProperty("font-face", "ºÚÌå");
-				pro.setProperty("text-size", "36");
+				pro.setProperty("text-size", "48");
+				pro.setProperty("step", "6");
+				pro.setProperty("step-time", "36");
+				pro.setProperty("queue-length", "5");
+				pro.setProperty("random-speed", "0");
 				pro.setProperty("updated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 				pro.storeToXML(fos, "created on "+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 				fos.close();
@@ -51,7 +55,6 @@ public class main {
 			fin.close();
 			
 		}catch(Exception e){
-			//e->getMessage();
 			e.printStackTrace();
 		}
 	}

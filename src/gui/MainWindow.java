@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.*;
@@ -43,6 +45,7 @@ public class MainWindow {
 		initOtherComponents();
 		// TODO 完成工程后将唯一显示放置此处 jfm 处自行删除
 		this._window = mainWindow;
+		this._window.pack();
 		mainWindow.setVisible(true);
 	}
 
@@ -127,6 +130,7 @@ public class MainWindow {
 		try {
 			url = new URL(textServer.getText());
 		} catch (MalformedURLException e1) {
+			e1.printStackTrace();
 			JOptionPane.showMessageDialog(mainWindow, "URL 格式不正确" + '\n' + "请输入正确的URL地址", "警示",
 					JOptionPane.ERROR_MESSAGE);
 			return;
@@ -136,7 +140,7 @@ public class MainWindow {
 		try {
 			addr = (Inet4Address) InetAddress.getByName(url.getHost());
 		} catch (UnknownHostException e1) {
-			JOptionPane.showMessageDialog(mainWindow, "URL 有错误" + '\n' + "请输入正确的URL地址", "警示",
+			JOptionPane.showMessageDialog(mainWindow, "找不到该主机名" + '\n' + "请输入正确的URL地址", "警示",
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -199,7 +203,7 @@ public class MainWindow {
 		JOptionPane.showMessageDialog(mainWindow, "(c) 济南大学图灵电脑协会", "版权信息", JOptionPane.PLAIN_MESSAGE);
 	}
 
-	private void runActionPerformed(ActionEvent e) {
+	public void runActionPerformed(ActionEvent e) {
 		if (Integer.parseInt(tfQueueLength.getText()) <= 0 || Integer.parseInt(tfStep.getText()) <= 0
 				|| Integer.parseInt((String) cbSize.getSelectedItem()) <= 0
 				|| Integer.parseInt(tfRefreshTime.getText()) <= 0 || Integer.parseInt(tfStepTime.getText()) <= 0
@@ -225,6 +229,7 @@ public class MainWindow {
 				@Override
 				public void run() {
 					run.setText("停止弹幕");
+					new Tray(MainWindow.this);
 				}
 			});
 		} else {
@@ -247,15 +252,32 @@ public class MainWindow {
 	 * @param e
 	 */
 	private void aboutActionPerformed(ActionEvent e) {
-		JOptionPane
-				.showMessageDialog(_window,
-						"弹幕姬 0.4 Alpha" + "\n\n" + "(c) 2016 T.C.A" + '\n' + "济南大学图灵电脑协会" + '\n' + "turing.com" + "\n\n" + "Client :" + '\n'
-								+ "(c) 2009-2016 Hafrans Stu." + '\n' + "hafrans.com",
-						"关于", JOptionPane.DEFAULT_OPTION);
+		JOptionPane.showMessageDialog(_window,
+				"弹幕姬 0.4 Alpha" + "\n\n" + "(c) 2016 T.C.A" + '\n' + "济南大学图灵电脑协会" + '\n' + "turing.com" + "\n\n"
+						+ "Client :" + '\n' + "(c) 2009-2016 Hafrans Stu." + '\n' + "hafrans.com",
+				"关于", JOptionPane.DEFAULT_OPTION);
 	}
 
 	private void updateActionPerformed(ActionEvent e) {
 		JOptionPane.showMessageDialog(_window, "当前为最新版本！");
+	}
+
+	private void openSourceActionPerformed(ActionEvent e) {
+		Desktop desk = Desktop.getDesktop();
+		URI url;
+		try {
+			url = new URI("https://github.com/hafrans/Dannmaku-hime");
+			desk.browse(url);
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+	}
+
+	private void settingActionPerformed(ActionEvent e) {
+		new AdvancedSetting(this);
 	}
 
 	private void initComponents() {
@@ -264,10 +286,12 @@ public class MainWindow {
 		mainWindow = new JFrame();
 		menuBar1 = new JMenuBar();
 		menu1 = new JMenu();
+		setting = new JMenuItem();
 		menu2 = new JMenu();
 		menuItemHelp = new JMenuItem();
 		menuItemUpdate = new JMenuItem();
 		menuItemAbout = new JMenuItem();
+		openSource = new JMenuItem();
 		label1 = new JLabel();
 		textServer = new JTextField();
 		fontSetting = new JPanel();
@@ -318,6 +342,11 @@ public class MainWindow {
 				//======== menu1 ========
 				{
 					menu1.setText("\u9ad8\u7ea7\u8bbe\u7f6e");
+
+					//---- setting ----
+					setting.setText("\u9ad8\u7ea7\u8bbe\u7f6e");
+					setting.addActionListener(e -> settingActionPerformed(e));
+					menu1.add(setting);
 				}
 				menuBar1.add(menu1);
 
@@ -338,6 +367,11 @@ public class MainWindow {
 					menuItemAbout.setText("\u5173\u4e8e");
 					menuItemAbout.addActionListener(e -> aboutActionPerformed(e));
 					menu2.add(menuItemAbout);
+
+					//---- openSource ----
+					openSource.setText("\u5f00\u6e90\u9879\u76ee");
+					openSource.addActionListener(e -> openSourceActionPerformed(e));
+					menu2.add(openSource);
 				}
 				menuBar1.add(menu2);
 			}
@@ -364,13 +398,7 @@ public class MainWindow {
 				label2.setBounds(new Rectangle(new Point(35, 35), label2.getPreferredSize()));
 
 				//---- cbFont ----
-				cbFont.setModel(new DefaultComboBoxModel<>(new String[] {
-					"2",
-					"2",
-					"6",
-					"4",
-					"4"
-				}));
+				cbFont.setModel(new DefaultComboBoxModel<>(new String[] { "2", "2", "6", "4", "4" }));
 				cbFont.addItemListener(e -> cbFontItemStateChanged(e));
 				fontSetting.add(cbFont);
 				cbFont.setBounds(70, 30, 185, 29);
@@ -381,22 +409,9 @@ public class MainWindow {
 				label3.setBounds(new Rectangle(new Point(260, 35), label3.getPreferredSize()));
 
 				//---- cbSize ----
-				cbSize.setModel(new DefaultComboBoxModel<>(new String[] {
-					"20",
-					"24",
-					"28",
-					"32",
-					"36",
-					"40",
-					"46",
-					"48",
-					"52",
-					"56",
-					"64",
-					"72",
-					"88"
-				}));
-				cbSize.setSelectedIndex(4);
+				cbSize.setModel(new DefaultComboBoxModel<>(
+						new String[] { "28", "32", "36", "40", "46", "48", "52", "56", "64", "72", "88" }));
+				cbSize.setSelectedIndex(5);
 				cbSize.addItemListener(e -> cbFontItemStateChanged(e));
 				fontSetting.add(cbSize);
 				cbSize.setBounds(300, 30, 125, 29);
@@ -468,7 +483,8 @@ public class MainWindow {
 
 			//======== panel2 ========
 			{
-				panel2.setBorder(new TitledBorder(null, "\u538b\u529b\u6d4b\u8bd5", TitledBorder.RIGHT, TitledBorder.DEFAULT_POSITION, null, Color.red));
+				panel2.setBorder(new TitledBorder(null, "\u538b\u529b\u6d4b\u8bd5", TitledBorder.RIGHT,
+						TitledBorder.DEFAULT_POSITION, null, Color.red));
 				panel2.setLayout(null);
 
 				//---- label7 ----
@@ -477,7 +493,7 @@ public class MainWindow {
 				label7.setBounds(45, 25, 35, label7.getPreferredSize().height);
 
 				//---- tfStep ----
-				tfStep.setText("2");
+				tfStep.setText("6");
 				panel2.add(tfStep);
 				tfStep.setBounds(95, 20, 70, tfStep.getPreferredSize().height);
 
@@ -487,7 +503,7 @@ public class MainWindow {
 				label8.setBounds(new Rectangle(new Point(200, 25), label8.getPreferredSize()));
 
 				//---- tfQueueLength ----
-				tfQueueLength.setText("5");
+				tfQueueLength.setText("6");
 				panel2.add(tfQueueLength);
 				tfQueueLength.setBounds(270, 20, 90, tfQueueLength.getPreferredSize().height);
 
@@ -497,7 +513,7 @@ public class MainWindow {
 				label9.setBounds(new Rectangle(new Point(20, 60), label9.getPreferredSize()));
 
 				//---- tfStepTime ----
-				tfStepTime.setText("20");
+				tfStepTime.setText("36");
 				panel2.add(tfStepTime);
 				tfStepTime.setBounds(95, 55, 75, tfStepTime.getPreferredSize().height);
 
@@ -507,7 +523,7 @@ public class MainWindow {
 				label10.setBounds(new Rectangle(new Point(200, 60), label10.getPreferredSize()));
 
 				//---- tfRefreshTime ----
-				tfRefreshTime.setText("200");
+				tfRefreshTime.setText("200000");
 				panel2.add(tfRefreshTime);
 				tfRefreshTime.setBounds(270, 55, 90, tfRefreshTime.getPreferredSize().height);
 
@@ -522,7 +538,7 @@ public class MainWindow {
 				tfPushTime.setBounds(120, 85, 240, tfPushTime.getPreferredSize().height);
 			}
 			mainWindowContentPane.add(panel2);
-			panel2.setBounds(70, 325, 430, 125);
+			panel2.setBounds(40, 325, 485, 140);
 
 			mainWindowContentPane.setPreferredSize(new Dimension(570, 580));
 			mainWindow.pack();
@@ -536,10 +552,12 @@ public class MainWindow {
 	private JFrame mainWindow;
 	private JMenuBar menuBar1;
 	private JMenu menu1;
+	private JMenuItem setting;
 	private JMenu menu2;
 	private JMenuItem menuItemHelp;
 	private JMenuItem menuItemUpdate;
 	private JMenuItem menuItemAbout;
+	private JMenuItem openSource;
 	private JLabel label1;
 	private JTextField textServer;
 	private JPanel fontSetting;
