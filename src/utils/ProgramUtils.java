@@ -7,13 +7,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
+import beans.SettingValuesBeans;
+
 public class ProgramUtils {
 
 	private ProgramUtils() {
 	}
 
-	public static void exit(int code, Properties pro) {
-		pro.setProperty("updated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+	public static void exit(int code,SettingValuesBeans bean) {
 		try {
 			Class<?> clazz = Class.forName("main");
 			Object obj = clazz.newInstance();
@@ -21,7 +22,7 @@ public class ProgramUtils {
 			refFilename.setAccessible(true);
 			File filename = (File) refFilename.get(obj);
 			FileOutputStream fos = new FileOutputStream(filename);
-			pro.storeToXML(fos, "updated on " + new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+			bean.storeToXML(fos);
 			fos.close();
 
 		} catch (Exception e) {
@@ -30,7 +31,7 @@ public class ProgramUtils {
 		if (code <= 100) {
 			System.exit(code);
 		} else {
-			System.err.println("保存数据操作");
+			System.err.println("淇濆瓨");
 		}
 
 	}

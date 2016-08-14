@@ -11,12 +11,14 @@ import java.util.Properties;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import beans.SettingValuesBeans;
+
 /**
  * @author Hafrans
  */
 public class AdvancedSetting {
 	private MainWindow window = null;
-	private Properties pro = MainWindow.pro;
+	private SettingValuesBeans bean = MainWindow.bean;
 	
 	public AdvancedSetting(MainWindow window) {
 		this.window = window;
@@ -25,7 +27,6 @@ public class AdvancedSetting {
 	}
 
 	private void initOtherComponents() {
-		//×ÖÌåcombox
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
@@ -82,12 +83,12 @@ public class AdvancedSetting {
 			//---- button1 ----
 			button1.setText("\u4fdd\u5b58");
 			adsetContentPane.add(button1);
-			button1.setBounds(new Rectangle(new Point(305, 395), button1.getPreferredSize()));
+			button1.setBounds(new Rectangle(new Point(305, 400), button1.getPreferredSize()));
 
 			//---- button2 ----
 			button2.setText("\u6062\u590d\u9ed8\u8ba4");
 			adsetContentPane.add(button2);
-			button2.setBounds(new Rectangle(new Point(400, 395), button2.getPreferredSize()));
+			button2.setBounds(new Rectangle(new Point(400, 400), button2.getPreferredSize()));
 
 			//======== tabbedPane1 ========
 			{
@@ -259,7 +260,7 @@ public class AdvancedSetting {
 				tabbedPane1.addTab("\u7f51\u7edc", panel2);
 			}
 			adsetContentPane.add(tabbedPane1);
-			tabbedPane1.setBounds(0, 0, 505, 385);
+			tabbedPane1.setBounds(10, 5, 485, 380);
 
 			{ // compute preferred size
 				Dimension preferredSize = new Dimension();
@@ -274,7 +275,7 @@ public class AdvancedSetting {
 				adsetContentPane.setMinimumSize(preferredSize);
 				adsetContentPane.setPreferredSize(preferredSize);
 			}
-			adset.pack();
+			adset.setSize(520, 485);
 			adset.setLocationRelativeTo(adset.getOwner());
 		}
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents

@@ -19,38 +19,34 @@ import javax.swing.*;
 import javax.swing.border.*;
 import com.jgoodies.forms.factories.*;
 
+import beans.SettingValuesBeans;
 import utils.ProgramUtils;
 
-/**
- * ÉèÖÃÖ÷½çÃæ
- * 
- * @author Hafrans
- */
+
 public class MainWindow {
 	/**
-	 * ĞòÁĞ»¯
+	 * ï¿½ï¿½ï¿½Ğ»ï¿½
 	 */
 	private static final long serialVersionUID = 154518528548548L;
 	public boolean isLaunched = false;
 	public Barrage _obj = null;
 	public JFrame _window = null;
-
+	public static SettingValuesBeans bean = new SettingValuesBeans();
 	/**
-	 * »ñÈ¡ÊµÀı
 	 * 
 	 * @author Hafrans
 	 */
 	public MainWindow() {
 		initComponents();
 		initOtherComponents();
-		// TODO Íê³É¹¤³Ìºó½«Î¨Ò»ÏÔÊ¾·ÅÖÃ´Ë´¦ jfm ´¦×ÔĞĞÉ¾³ı
+		// TODO ï¿½ï¿½É¹ï¿½ï¿½Ìºï¿½Î¨Ò»ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ã´Ë´ï¿½ jfm ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½
 		this._window = mainWindow;
 		this._window.pack();
 		mainWindow.setVisible(true);
 	}
 
 	/**
-	 * ³õÊÔ»¯ÆäËû×é¼ş
+	 * initialize other Components
 	 * 
 	 * @author Hafrans
 	 */
@@ -67,45 +63,47 @@ public class MainWindow {
 		Class clazz = null;
 		try {
 			clazz = Class.forName("main");
-			pro = (Properties) clazz.getField("pro").get(clazz.newInstance());
-			if (pro == null) {
-				throw new IllegalAccessException("»ñÈ¡²»µ½×ÊÔ´");
+			bean = (SettingValuesBeans) clazz.getField("bean").get(clazz.newInstance());
+			if (bean == null) {
+				throw new IllegalAccessException("Bean is not Found");
 			}
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(mainWindow, "ÎŞ·¨»ñÈ¡ÏµÍ³×ÊÔ´£¡");
+			JOptionPane.showMessageDialog(mainWindow, "å‚æ•°é”™è¯¯");
 			System.exit(-1);
 		}
-		final Properties _pro = pro;
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
 			public void run() {
-				heartBeat.setText(_pro.getProperty("heartbeat"));
-				cbFont.setSelectedItem(_pro.getProperty("font-face"));
-				cbSize.setSelectedItem(_pro.getProperty("text-size"));
+				heartBeat.setText(bean.getHeartbeat());
+				cbFont.setSelectedItem(bean.getFontFace());
+				cbSize.setSelectedItem(bean.getFontSize());
+				textServer.setText(bean.getServerAddress());
+				tfQueueLength.setText(bean.getQueueLength());
+				tfStepTime.setText(bean.getStepTime());
+				tfStep.setText(bean.getStep());
 			}
 		});
 
 	}
 
 	/**
-	 * ´°¿Ú¹Ø±ÕµÄÊÂ¼ş´¦Àí
+	 * 
 	 * 
 	 * @param e
 	 *            WindowEvent
 	 */
 	private void mainWindowWindowClosing(WindowEvent e) {
-		int state = JOptionPane.showConfirmDialog(e.getComponent(), "ÊÇ·ñ½«³ÌĞò¼ÓÈëÏµÍ³ÍĞÅÌ£¿" + '\n' + "²»¼ÓÈëÏµÍ³ÍĞÅÌ½«ÍË³ö¸Ã³ÌĞò", "ÍË³öÌáÊ¾",
+		int state = JOptionPane.showConfirmDialog(e.getComponent(), "å³å°†é€€å‡ºç³»ç»Ÿ" + '\n' + "æ˜¯å¦åŠ å…¥ç³»ç»Ÿæ‰˜ç›˜ï¼Ÿ", "ishi",
 				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 		switch (state) {
 		case 0:
 			System.out.println("Yes");
 			new Tray(this);
-			// TODO ÓÃWINAPI with JNI ×¢²áÈ«¾Ö¼üÅÌ¼àÌı
 			mainWindow.setVisible(false);
 			break;
 		case 1:
-			ProgramUtils.exit(0, MainWindow.pro);
+			ProgramUtils.exit(0, MainWindow.bean);
 			break;
 		case 2:
 			return;
@@ -131,7 +129,7 @@ public class MainWindow {
 			url = new URL(textServer.getText());
 		} catch (MalformedURLException e1) {
 			e1.printStackTrace();
-			JOptionPane.showMessageDialog(mainWindow, "URL ¸ñÊ½²»ÕıÈ·" + '\n' + "ÇëÊäÈëÕıÈ·µÄURLµØÖ·", "¾¯Ê¾",
+			JOptionPane.showMessageDialog(mainWindow, "URL æ ¼å¼ä¸æ­£ç¡®" + '\n' + "è¯·æ£€æŸ¥æ‚¨çš„URL", "æç¤º",
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -140,23 +138,24 @@ public class MainWindow {
 		try {
 			addr = (Inet4Address) InetAddress.getByName(url.getHost());
 		} catch (UnknownHostException e1) {
-			JOptionPane.showMessageDialog(mainWindow, "ÕÒ²»µ½¸ÃÖ÷»úÃû" + '\n' + "ÇëÊäÈëÕıÈ·µÄURLµØÖ·", "¾¯Ê¾",
+			JOptionPane.showMessageDialog(mainWindow, "æ­¤URLæ‰¾ä¸åˆ°ç›®æ ‡ä¸»æœº" + '\n' + "è¯·æ£€æŸ¥æ‚¨çš„URL", "æç¤º",
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		final Inet4Address myaddr = addr;
 		JDialog jdi = new JDialog(mainWindow);
+		jdi.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		jdi.setAlwaysOnTop(true);
 		Container con = jdi.getContentPane();
 		con.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 20));
 		button2.setEnabled(false);
-		final JLabel jba = new JLabel("ÕıÔÚ²âÊÔ¡­¡­");
+		final JLabel jba = new JLabel("æ­£åœ¨æµ‹è¯•â€¦â€¦");
 		con.add(jba);
-		final JButton jbtn = new JButton("È·¶¨");
+		final JButton jbtn = new JButton("ç¡®å®š");
 		con.add(jbtn);
 		jdi.setSize(200, 150);
 		jdi.setLocationRelativeTo(mainWindow);
-		jdi.setTitle("²âÊÔ");
+		jdi.setTitle("æç¤º");
 		jdi.setVisible(true);
 
 		new Thread(new Runnable() {
@@ -165,16 +164,17 @@ public class MainWindow {
 			public void run() {
 				try {
 					if (myaddr.isReachable(5000)) {
-						jba.setText("²âÊÔ³É¹¦");
+						jba.setText("æµ‹è¯•æˆåŠŸ");
 						// jdi.setVisible(true);
 						System.out.println("success");
 					} else {
-						jba.setText("²âÊÔÊ§°Ü");
+						jba.setText("æµ‹è¯•å¤±è´¥");
 						// jdi.setVisible(true);
 						System.out.println("failed");
 					}
 				} catch (IOException e) {
-					jba.setText("Î´ÖªµÄ²âÊÔÊ§°Ü");
+					jba.setText("æµ‹è¯•é”™è¯¯");
+					e.printStackTrace();
 				}
 				jbtn.addActionListener(new ActionListener() {
 
@@ -191,16 +191,19 @@ public class MainWindow {
 	}
 
 	private void saveActionPerformed(ActionEvent e) {
-		MainWindow.pro.setProperty("server-address", textServer.getText());
-		MainWindow.pro.setProperty("font-face", cbFont.getSelectedItem().toString());
-		MainWindow.pro.setProperty("text-size", cbSize.getSelectedItem().toString());
-		MainWindow.pro.setProperty("heartbeat", heartBeat.getText());
-		ProgramUtils.exit(111, pro);
-		JOptionPane.showMessageDialog(mainWindow, "±£´æ³É¹¦");
+		bean.setFontFace(cbFont.getSelectedItem());
+		bean.setFontSize(cbSize.getSelectedItem());
+		bean.setHeartbeat(heartBeat.getText());
+		bean.setStep(tfStep.getText());
+		bean.setQueueLength(tfQueueLength.getText());
+		bean.setServerAddress(textServer.getText());
+		bean.setStepTime(tfStepTime.getText());
+		ProgramUtils.exit(111, bean);
+		JOptionPane.showMessageDialog(mainWindow, "ä¿å­˜æˆåŠŸ");
 	}
 
 	private void TCAMouseClicked(MouseEvent e) {
-		JOptionPane.showMessageDialog(mainWindow, "(c) ¼ÃÄÏ´óÑ§Í¼ÁéµçÄÔĞ­»á", "°æÈ¨ĞÅÏ¢", JOptionPane.PLAIN_MESSAGE);
+		JOptionPane.showMessageDialog(mainWindow, "(c) 2016 TCA"+"\n"+"Dannmaku hime"+"\n"+"å¼¹å¹•å§¬"+"\n"+"å¼¾å¹•(ã ã‚“ã¾ã)å§«ï¼ˆã²ã‚ï¼‰", "å£°æ˜", JOptionPane.PLAIN_MESSAGE);
 	}
 
 	public void runActionPerformed(ActionEvent e) {
@@ -208,14 +211,8 @@ public class MainWindow {
 				|| Integer.parseInt((String) cbSize.getSelectedItem()) <= 0
 				|| Integer.parseInt(tfRefreshTime.getText()) <= 0 || Integer.parseInt(tfStepTime.getText()) <= 0
 				|| Integer.parseInt(tfPushTime.getText()) <= 0) {
-			JOptionPane.showMessageDialog(mainWindow, "ÉèÖÃ¹ÊÕÏ£¡");
+			JOptionPane.showMessageDialog(mainWindow, "å‚æ•°æœ‰è¯¯");
 			return;
-		}
-		if (Integer.parseInt(tfPushTime.getText()) < 200) {
-			if (JOptionPane.showConfirmDialog(mainWindow, "ÄãµÄÖµÉèÖÃµÄÓĞµã¼«¶Ë" + '\n' + "ÄúÈ·¶¨Òª¼ÌĞø£¿", "¾¯¸æ",
-					JOptionPane.OK_CANCEL_OPTION) != 0) {
-				return;
-			}
 		}
 		if (this.isLaunched == false) {
 			this.isLaunched = true;
@@ -228,7 +225,7 @@ public class MainWindow {
 
 				@Override
 				public void run() {
-					run.setText("Í£Ö¹µ¯Ä»");
+					run.setText("åœæ­¢å¼¹å¹•");
 					new Tray(MainWindow.this);
 				}
 			});
@@ -239,27 +236,22 @@ public class MainWindow {
 
 				@Override
 				public void run() {
-					run.setText("¿ªÊ¼µ¯Ä»");
+					run.setText("å¼€å§‹å¼¹å¹•");
 				}
 			});
 
 		}
 	}
 
-	/**
-	 * Èí¼ş -- ¹ØÓÚ½çÃæ
-	 * 
-	 * @param e
-	 */
 	private void aboutActionPerformed(ActionEvent e) {
 		JOptionPane.showMessageDialog(_window,
-				"µ¯Ä»¼§ 0.4 Alpha" + "\n\n" + "(c) 2016 T.C.A" + '\n' + "¼ÃÄÏ´óÑ§Í¼ÁéµçÄÔĞ­»á" + '\n' + "turing.com" + "\n\n"
+				"å¼¹å¹•å§¬ 0.4 Alpha" + "\n\n" + "(c) 2016 T.C.A" + '\n' + "æµå—å¤§å­¦å›¾çµç”µè„‘åä¼š" + '\n' + "turing.com" + "\n\n"
 						+ "Client :" + '\n' + "(c) 2009-2016 Hafrans Stu." + '\n' + "hafrans.com",
-				"¹ØÓÚ", JOptionPane.DEFAULT_OPTION);
+				"å…³äº", JOptionPane.DEFAULT_OPTION);
 	}
 
 	private void updateActionPerformed(ActionEvent e) {
-		JOptionPane.showMessageDialog(_window, "µ±Ç°Îª×îĞÂ°æ±¾£¡");
+		JOptionPane.showMessageDialog(_window, "æ‚¨çš„ç‰ˆæœ¬ç›®å‰æœ€æ–°");
 	}
 
 	private void openSourceActionPerformed(ActionEvent e) {
@@ -341,7 +333,7 @@ public class MainWindow {
 
 				//======== menu1 ========
 				{
-					menu1.setText("\u9ad8\u7ea7\u8bbe\u7f6e");
+					menu1.setText("\u7a0b\u5e8f");
 
 					//---- setting ----
 					setting.setText("\u9ad8\u7ea7\u8bbe\u7f6e");
@@ -587,6 +579,6 @@ public class MainWindow {
 	private JLabel label11;
 	private JTextField tfPushTime;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
-	public static Properties pro = null;
+
 
 }

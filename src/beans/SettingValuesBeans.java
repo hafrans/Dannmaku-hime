@@ -1,18 +1,61 @@
 package beans;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
 public class SettingValuesBeans {
+	private Properties pro = null;
 	private String serverAddress = "http://api.hafrans.com/api.php?action=barrage";
 	private String heartbeat = "3";
-	private String fontFace = "ºÚÌå";
+	private String fontFace = "é»‘ä½“";
 	private String fontSize = "48";
 	private String color    = "RED";
 	private String step = "6";
 	private String stepTime = "36";
 	private String queueLength = "6";
+	
+	public SettingValuesBeans(Properties pro) {
+		loadProperties(pro);
+		this.pro = (Properties) pro.clone();
+	}
+	public SettingValuesBeans(){
+		storeProperties();
+	}
+	public void storeToXML(OutputStream fos) throws IOException{
+		storeProperties();
+		pro.storeToXML(fos, new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+	}
+	public void loadFromXML(InputStream fis) throws IOException{
+		pro.loadFromXML(fis);
+		loadProperties(pro);
+	}
+	private void loadProperties(Properties pro) {
+		serverAddress = pro.getProperty("server-address",serverAddress);
+		heartbeat = pro.getProperty("heart", heartbeat);
+		fontFace = pro.getProperty("font-face", fontFace);
+		fontSize = pro.getProperty("font-size", fontSize);
+		color = pro.getProperty("color",color);
+		step = pro.getProperty("step", step);
+		stepTime = pro.getProperty("step-time", stepTime);
+		queueLength = pro.getProperty("queue-length", queueLength);
+	}
+	private void storeProperties(){
+		if(this.pro == null){
+			pro = new Properties();
+		}
+		pro.setProperty("server-address",serverAddress);
+		pro.setProperty("heart", heartbeat);
+		pro.setProperty("font-face", fontFace);
+		pro.setProperty("font-size", fontSize);
+		pro.setProperty("color",color);
+		pro.setProperty("step", step);
+		pro.setProperty("step-time", stepTime);
+		pro.setProperty("queue-length", queueLength);
+	}
 
 	/**
 	 * @return the serverAddress
@@ -47,8 +90,8 @@ public class SettingValuesBeans {
 	/**
 	 * @param fontFace the fontFace to set
 	 */
-	public void setFontFace(String fontFace) {
-		this.fontFace = fontFace;
+	public void setFontFace(Object fontFace) {
+		this.fontFace = (String) fontFace;
 	}
 	/**
 	 * @return the fontSize
@@ -59,8 +102,8 @@ public class SettingValuesBeans {
 	/**
 	 * @param fontSize the fontSize to set
 	 */
-	public void setFontSize(String fontSize) {
-		this.fontSize = fontSize;
+	public void setFontSize(Object fontSize) {
+		this.fontSize = (String) fontSize;
 	}
 	/**
 	 * @return the color
@@ -110,25 +153,6 @@ public class SettingValuesBeans {
 	public void setQueueLength(String queueLength) {
 		this.queueLength = queueLength;
 	}
-	public SettingValuesBeans(Properties pro) {
-//		pro.setProperty("server-address", "http://api.hafrans.com/api.php?action=barrage");
-//		pro.setProperty("heartbeat", "3");
-//		pro.setProperty("font-face", "ºÚÌå");
-//		pro.setProperty("text-size", "48");
-//		pro.setProperty("step", "6");
-//		pro.setProperty("step-time", "36");
-//		pro.setProperty("queue-length", "5");
-//		pro.setProperty("random-speed", "0");
-//		pro.setProperty("updated", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-//		pro.storeToXML(fos, "created on "+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-//		fos.close();
-		serverAddress = pro.getProperty("server-address","http://api.hafrans.com/?api=null");
-		heartbeat = pro.getProperty("heart", "3");
-		fontFace = pro.getProperty("font-face", "ºÚÌå");
-		fontSize = pro.getProperty("font-suze", "48");
-	}
-	public SettingValuesBeans(){
-		
-	}
+
 
 }

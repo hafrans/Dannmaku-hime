@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.AWTException;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -17,10 +18,11 @@ import java.util.TimerTask;
 import javax.swing.ImageIcon;
 import javax.swing.Popup;
 
+import beans.SettingValuesBeans;
 import utils.ProgramUtils;
 
 public class Tray {
-	public Properties pro = MainWindow.pro;
+	private SettingValuesBeans bean = MainWindow.bean;
 	private MainWindow window = null;
 	private static SystemTray tray = null;
 	private TrayIcon icon = null;
@@ -38,7 +40,7 @@ public class Tray {
 		if (tray != null)
 			return;
 		if (!SystemTray.isSupported()) {
-			System.err.println("²»Ö§³ÖÍĞÅÌ£¡");
+			System.err.println("ç³»ç»Ÿä¸æ”¯æŒæ‰˜ç›˜ï¼");
 		}
 		if (tray == null) {
 			tray = SystemTray.getSystemTray();
@@ -63,15 +65,15 @@ public class Tray {
 		
 		popup = new PopupMenu();
 
-		showMain = new MenuItem("ÏÔÊ¾Ö÷²Ëµ¥");
-		start = new MenuItem("Í£Ö¹µ¯Ä»");
-		clear = new MenuItem("Çå³ıµ¯Ä»");
-		MenuItem exit = new MenuItem("ÍË³ö");
+		showMain = new MenuItem("æ˜¾ç¤ºä¸»èœå•");
+		start = new MenuItem("å¼€å§‹å¼¹å¹•");
+		clear = new MenuItem("åœæ­¢å¼¹å¹•");
+		MenuItem exit = new MenuItem("é€€å‡º");
 		exit.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ProgramUtils.exit(0, MainWindow.pro);
+				ProgramUtils.exit(0, bean);
 			}
 		});
 
@@ -87,7 +89,9 @@ public class Tray {
 		popup.addSeparator();
 		popup.add(start);
 		popup.add(clear);
+		popup.addSeparator();
 		popup.add(exit);
+		popup.setFont(new Font("é»‘ä½“",Font.PLAIN,20));
 		
 		
 		start.addActionListener(new ActionListener() {
@@ -104,7 +108,7 @@ public class Tray {
 				Tray.this.clear();
 			}
 		});
-		//¹Û²ìÏß³Ì
+		//ï¿½Û²ï¿½ï¿½ß³ï¿½
 		Thread mThread = new Thread(new Runnable() {
 			
 			@Override
@@ -113,10 +117,9 @@ public class Tray {
 				while(true){
 					status = start.getLabel();
 					if (window.isLaunched) {
-						start.setLabel("Í£Ö¹µ¯Ä»");
-					} else if(window.isLaunched == false && "Í£Ö¹µ¯Ä»".equals(status)) {
-						start.setLabel("¿ªÊ¼µ¯Ä»");
-						setRunIcon();
+						setStart();
+					} else if(window.isLaunched == false && "åœæ­¢å¼¹å¹•".equals(status)) {
+						setStop();
 					}
 					try {
 						Thread.sleep(1000);
@@ -131,14 +134,14 @@ public class Tray {
 		mThread.start();
 		
 
-		icon = new TrayIcon(imageActive, "µ¯Ä»¼§", popup);
+		icon = new TrayIcon(imageActive, "å¼¹å¹•å§¬åœ¨è¿™å„¿~", popup);
 		
 		
 		new Timer().schedule(new TimerTask() {
 			
 			@Override
 			public void run() {
-				icon.displayMessage("µ¯Ä»¼§Ğ¡ÌáÊ¾", "µ¯Ä»¼§ÒÑ¾­½øÈëÏµÍ³ÍĞÅÌ~~", MessageType.INFO);
+				icon.displayMessage("æ¥è‡ªå¼¹å¹•å§¬çš„é—®å€™", "æ‚¨çš„å¼¹å¹•å§¬ç°åœ¨å°±åœ¨æ‰˜ç›˜é‡Œå‘¢~~", MessageType.INFO);
 			}
 		}, 500);
 		if(window.isLaunched){
@@ -164,11 +167,9 @@ public class Tray {
 	private void stopOrStart() {
 		window.runActionPerformed(null);
 		if (window.isLaunched) {
-			start.setLabel("¿ªÊ¼µ¯Ä»");
-			setRunIcon();
+			setStart();
 		} else {
-			start.setLabel("Í£Ö¹µ¯Ä»");
-			setStopIcon();
+			setStop();
 		}
 	}
 	private void clear(){
@@ -210,6 +211,19 @@ public class Tray {
 			return;
 		isIconSet = false;
 		icon.setImage(imageDefault);
+	}
+	private synchronized void setStart(){
+		if (window.isLaunched) {
+			start.setLabel("åœæ­¢å¼¹å¹•");
+			setRunIcon();
+		}
+	}
+	private synchronized void setStop(){
+		if (!window.isLaunched) {
+			start.setLabel("å¼€å§‹å¼¹å¹•");
+			setStopIcon();
+		}
+		
 	}
 
 }

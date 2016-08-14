@@ -139,7 +139,7 @@ public class Barrage extends JWindow {
 			@Override
 			public void run() {
 				if (Barrage.this.isVisible()) {
-					writeBarrage("测试文本--用于压力测试", fontface, String.valueOf(textSize));
+					writeBarrage("测试文本--用于压力测试----", fontface, String.valueOf(textSize));
 					System.out.println("测试");
 				}
 			}

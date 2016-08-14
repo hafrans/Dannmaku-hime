@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-<comment>updated on 2016-08-13</comment>
+<comment>2016-08-14</comment>
 <entry key="font-face">黑体</entry>
-<entry key="updated">2016-08-13</entry>
-<entry key="server-address">http://api.hafrans.com/barrage/api.php?action=gettext&amp;privilege=public</entry>
-<entry key="heartbeat">3</entry>
-<entry key="text-size">48</entry>
+<entry key="heart">3</entry>
+<entry key="step-time">36</entry>
+<entry key="color">RED</entry>
+<entry key="server-address"/>
+<entry key="step">600</entry>
+<entry key="queue-length">6</entry>
+<entry key="font-size">48</entry>
 </properties>
