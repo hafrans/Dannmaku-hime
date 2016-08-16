@@ -25,7 +25,7 @@ public class Tray {
 	private SettingValuesBeans bean = MainWindow.bean;
 	private MainWindow window = null;
 	private static SystemTray tray = null;
-	private TrayIcon icon = null;
+	public static TrayIcon icon = null;
 	private URL imgDefault = this.getClass().getResource("/img/appbar.png");
 	private URL imgActive = this.getClass().getResource("/img/appbar.png");
 	private PopupMenu popup;
@@ -67,7 +67,7 @@ public class Tray {
 
 		showMain = new MenuItem("显示主菜单");
 		start = new MenuItem("开始弹幕");
-		clear = new MenuItem("停止弹幕");
+		clear = new MenuItem("清空弹幕");
 		MenuItem exit = new MenuItem("退出");
 		exit.addActionListener(new ActionListener() {
 			
@@ -91,7 +91,7 @@ public class Tray {
 		popup.add(clear);
 		popup.addSeparator();
 		popup.add(exit);
-		popup.setFont(new Font("黑体",Font.PLAIN,20));
+		popup.setFont(new Font("黑体",Font.PLAIN,18));
 		
 		
 		start.addActionListener(new ActionListener() {

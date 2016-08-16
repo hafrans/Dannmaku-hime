@@ -17,16 +17,15 @@ import java.net.UnknownHostException;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.event.*;
 import com.jgoodies.forms.factories.*;
 
 import beans.SettingValuesBeans;
 import utils.ProgramUtils;
 
 
-public class MainWindow {
-	/**
-	 * ���л�
-	 */
+public class MainWindow implements Saveable {
+
 	private static final long serialVersionUID = 154518528548548L;
 	public boolean isLaunched = false;
 	public Barrage _obj = null;
@@ -38,8 +37,19 @@ public class MainWindow {
 	 */
 	public MainWindow() {
 		initComponents();
+		@SuppressWarnings("rawtypes")
+		Class clazz = null;
+		try {
+			clazz = Class.forName("main");
+			bean = (SettingValuesBeans) clazz.getField("bean").get(clazz.newInstance());
+			if (bean == null) {
+				throw new IllegalAccessException("Bean is not Found");
+			}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(mainWindow, "参数错误");
+			System.exit(-1);
+		}
 		initOtherComponents();
-		// TODO ��ɹ��̺�Ψһ��ʾ���ô˴� jfm ������ɾ��
 		this._window = mainWindow;
 		this._window.pack();
 		mainWindow.setVisible(true);
@@ -59,18 +69,6 @@ public class MainWindow {
 						GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()));
 			}
 		});
-		@SuppressWarnings("rawtypes")
-		Class clazz = null;
-		try {
-			clazz = Class.forName("main");
-			bean = (SettingValuesBeans) clazz.getField("bean").get(clazz.newInstance());
-			if (bean == null) {
-				throw new IllegalAccessException("Bean is not Found");
-			}
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(mainWindow, "参数错误");
-			System.exit(-1);
-		}
 		SwingUtilities.invokeLater(new Runnable() {
 
 			@Override
@@ -79,9 +77,6 @@ public class MainWindow {
 				cbFont.setSelectedItem(bean.getFontFace());
 				cbSize.setSelectedItem(bean.getFontSize());
 				textServer.setText(bean.getServerAddress());
-				tfQueueLength.setText(bean.getQueueLength());
-				tfStepTime.setText(bean.getStepTime());
-				tfStep.setText(bean.getStep());
 			}
 		});
 
@@ -94,7 +89,7 @@ public class MainWindow {
 	 *            WindowEvent
 	 */
 	private void mainWindowWindowClosing(WindowEvent e) {
-		int state = JOptionPane.showConfirmDialog(e.getComponent(), "即将退出系统" + '\n' + "是否加入系统托盘？", "ishi",
+		int state = JOptionPane.showConfirmDialog(e.getComponent(), "即将退出系统" + '\n' + "是否加入系统托盘？", "提示",
 				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 		switch (state) {
 		case 0:
@@ -191,15 +186,7 @@ public class MainWindow {
 	}
 
 	private void saveActionPerformed(ActionEvent e) {
-		bean.setFontFace(cbFont.getSelectedItem());
-		bean.setFontSize(cbSize.getSelectedItem());
-		bean.setHeartbeat(heartBeat.getText());
-		bean.setStep(tfStep.getText());
-		bean.setQueueLength(tfQueueLength.getText());
-		bean.setServerAddress(textServer.getText());
-		bean.setStepTime(tfStepTime.getText());
-		ProgramUtils.exit(111, bean);
-		JOptionPane.showMessageDialog(mainWindow, "保存成功");
+		save();
 	}
 
 	private void TCAMouseClicked(MouseEvent e) {
@@ -207,20 +194,43 @@ public class MainWindow {
 	}
 
 	public void runActionPerformed(ActionEvent e) {
-		if (Integer.parseInt(tfQueueLength.getText()) <= 0 || Integer.parseInt(tfStep.getText()) <= 0
-				|| Integer.parseInt((String) cbSize.getSelectedItem()) <= 0
-				|| Integer.parseInt(tfRefreshTime.getText()) <= 0 || Integer.parseInt(tfStepTime.getText()) <= 0
-				|| Integer.parseInt(tfPushTime.getText()) <= 0) {
-			JOptionPane.showMessageDialog(mainWindow, "参数有误");
-			return;
-		}
+	
+
 		if (this.isLaunched == false) {
+			
+			
+			
+			
+			if(cbDebug.isSelected()){
+				try{
+					_obj = new Barrage(Integer.parseInt(bean.getQueueLength()), Integer.parseInt(bean.getStep()),
+							Integer.parseInt(bean.getFontSize()),0,
+							Integer.parseInt(bean.getStepTime()),Integer.parseInt(tfPushTime.getText().trim()),
+							(String) cbFont.getSelectedItem());
+				}catch (Exception e1) {
+					JOptionPane.showMessageDialog(_window, "请检查的您的参数配置是否有问题");
+					e1.printStackTrace();
+					return;
+				}
+				System.out.println("Debug start");
+			}else{
+				try{
+					_obj = new Barrage(bean);
+				}catch (NumberFormatException e1) {
+					JOptionPane.showMessageDialog(_window, "请检查的您的参数配置是否有问题");
+					e1.printStackTrace();
+				}catch (Exception e2) {
+					JOptionPane.showMessageDialog(_window, "未知异常");
+					e2.printStackTrace();
+				}
+			}
+			
+			
+			
+			
+			
+			
 			this.isLaunched = true;
-			_obj = new Barrage(Integer.parseInt(tfQueueLength.getText()), Integer.parseInt(tfStep.getText()),
-					Integer.parseInt((String) cbSize.getSelectedItem()), Integer.parseInt(tfRefreshTime.getText()),
-					Integer.parseInt(tfStepTime.getText()), Integer.parseInt(tfPushTime.getText()),
-					(String) cbFont.getSelectedItem());
-			System.out.println(_obj);
 			SwingUtilities.invokeLater(new Runnable() {
 
 				@Override
@@ -229,6 +239,7 @@ public class MainWindow {
 					new Tray(MainWindow.this);
 				}
 			});
+			
 		} else {
 			this.isLaunched = false;
 			_obj.dispose();
@@ -272,6 +283,15 @@ public class MainWindow {
 		new AdvancedSetting(this);
 	}
 
+	private void cbDebugActionPerformed(ActionEvent e) {
+		JCheckBoxMenuItem cb = (JCheckBoxMenuItem) e.getSource();
+		if(cb.getState()){
+			debugPanel.setVisible(true);
+		}else{
+			debugPanel.setVisible(false);
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -279,6 +299,7 @@ public class MainWindow {
 		menuBar1 = new JMenuBar();
 		menu1 = new JMenu();
 		setting = new JMenuItem();
+		cbDebug = new JCheckBoxMenuItem();
 		menu2 = new JMenu();
 		menuItemHelp = new JMenuItem();
 		menuItemUpdate = new JMenuItem();
@@ -301,16 +322,8 @@ public class MainWindow {
 		button2 = new JButton();
 		run = new JButton();
 		label6 = new JLabel();
-		panel2 = new JPanel();
+		debugPanel = new JPanel();
 		label7 = new JLabel();
-		tfStep = new JTextField();
-		label8 = new JLabel();
-		tfQueueLength = new JTextField();
-		label9 = new JLabel();
-		tfStepTime = new JTextField();
-		label10 = new JLabel();
-		tfRefreshTime = new JTextField();
-		label11 = new JLabel();
 		tfPushTime = new JTextField();
 
 		//======== mainWindow ========
@@ -319,6 +332,10 @@ public class MainWindow {
 			mainWindow.setVisible(true);
 			mainWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 			mainWindow.setForeground(Color.darkGray);
+			mainWindow.setIconImage(((ImageIcon) UIManager.getIcon("FileView.computerIcon")).getImage());
+			mainWindow.setMinimumSize(new Dimension(4, 4));
+			mainWindow.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+			mainWindow.setResizable(false);
 			mainWindow.addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent e) {
@@ -330,6 +347,8 @@ public class MainWindow {
 
 			//======== menuBar1 ========
 			{
+				menuBar1.setAutoscrolls(true);
+				menuBar1.setMinimumSize(new Dimension(2, 1000));
 
 				//======== menu1 ========
 				{
@@ -339,6 +358,11 @@ public class MainWindow {
 					setting.setText("\u9ad8\u7ea7\u8bbe\u7f6e");
 					setting.addActionListener(e -> settingActionPerformed(e));
 					menu1.add(setting);
+
+					//---- cbDebug ----
+					cbDebug.setText("\u8c03\u8bd5\u5f39\u5e55");
+					cbDebug.addActionListener(e -> cbDebugActionPerformed(e));
+					menu1.add(cbDebug);
 				}
 				menuBar1.add(menu1);
 
@@ -359,6 +383,7 @@ public class MainWindow {
 					menuItemAbout.setText("\u5173\u4e8e");
 					menuItemAbout.addActionListener(e -> aboutActionPerformed(e));
 					menu2.add(menuItemAbout);
+					menu2.addSeparator();
 
 					//---- openSource ----
 					openSource.setText("\u5f00\u6e90\u9879\u76ee");
@@ -367,17 +392,18 @@ public class MainWindow {
 				}
 				menuBar1.add(menu2);
 			}
-			mainWindow.setJMenuBar(menuBar1);
+			mainWindowContentPane.add(menuBar1);
+			menuBar1.setBounds(0, 0, 554, 26);
 
 			//---- label1 ----
 			label1.setText("\u670d\u52a1\u5668\u5730\u5740");
 			mainWindowContentPane.add(label1);
-			label1.setBounds(new Rectangle(new Point(45, 30), label1.getPreferredSize()));
+			label1.setBounds(30, 55, 75, 18);
 
 			//---- textServer ----
 			textServer.setText("http://api.hafrans.com/barrage/api.php?action=gettext&privilege=public");
 			mainWindowContentPane.add(textServer);
-			textServer.setBounds(135, 25, 385, textServer.getPreferredSize().height);
+			textServer.setBounds(115, 50, 385, 24);
 
 			//======== fontSetting ========
 			{
@@ -426,40 +452,40 @@ public class MainWindow {
 				scrollPane1.setBounds(35, 80, 440, 100);
 			}
 			mainWindowContentPane.add(fontSetting);
-			fontSetting.setBounds(35, 115, 490, 190);
+			fontSetting.setBounds(25, 140, 490, 190);
 
 			//---- label4 ----
 			label4.setText("\u6293\u53d6\u9891\u7387");
 			mainWindowContentPane.add(label4);
-			label4.setBounds(55, 70, 75, 18);
+			label4.setBounds(45, 95, 75, 18);
 
 			//---- heartBeat ----
 			heartBeat.setText("3");
 			mainWindowContentPane.add(heartBeat);
-			heartBeat.setBounds(135, 65, 100, 24);
+			heartBeat.setBounds(115, 90, 100, 24);
 
 			//---- label5 ----
 			label5.setText("\u79d2");
 			mainWindowContentPane.add(label5);
-			label5.setBounds(240, 70, 30, 18);
+			label5.setBounds(225, 95, 30, 18);
 
 			//---- button1 ----
 			button1.setText("\u4fdd\u5b58");
 			button1.addActionListener(e -> saveActionPerformed(e));
 			mainWindowContentPane.add(button1);
-			button1.setBounds(new Rectangle(new Point(335, 485), button1.getPreferredSize()));
+			button1.setBounds(340, 380, 65, 27);
 
 			//---- button2 ----
 			button2.setText("\u6d4b\u8bd5");
 			button2.addActionListener(e -> testActionPerformed(e));
 			mainWindowContentPane.add(button2);
-			button2.setBounds(new Rectangle(new Point(450, 65), button2.getPreferredSize()));
+			button2.setBounds(435, 90, 65, 27);
 
 			//---- run ----
 			run.setText("\u5f00\u542f\u5f39\u5e55");
 			run.addActionListener(e -> runActionPerformed(e));
 			mainWindowContentPane.add(run);
-			run.setBounds(new Rectangle(new Point(430, 485), run.getPreferredSize()));
+			run.setBounds(420, 380, 95, 27);
 
 			//---- label6 ----
 			label6.setText("(c) 2016 - TCA");
@@ -471,70 +497,28 @@ public class MainWindow {
 				}
 			});
 			mainWindowContentPane.add(label6);
-			label6.setBounds(new Rectangle(new Point(420, 525), label6.getPreferredSize()));
+			label6.setBounds(10, 390, 112, 18);
 
-			//======== panel2 ========
+			//======== debugPanel ========
 			{
-				panel2.setBorder(new TitledBorder(null, "\u538b\u529b\u6d4b\u8bd5", TitledBorder.RIGHT,
-						TitledBorder.DEFAULT_POSITION, null, Color.red));
-				panel2.setLayout(null);
+				debugPanel.setLayout(null);
 
 				//---- label7 ----
-				label7.setText("\u6b65\u8fdb");
-				panel2.add(label7);
-				label7.setBounds(45, 25, 35, label7.getPreferredSize().height);
-
-				//---- tfStep ----
-				tfStep.setText("6");
-				panel2.add(tfStep);
-				tfStep.setBounds(95, 20, 70, tfStep.getPreferredSize().height);
-
-				//---- label8 ----
-				label8.setText("\u961f\u5217\u957f\u5ea6");
-				panel2.add(label8);
-				label8.setBounds(new Rectangle(new Point(200, 25), label8.getPreferredSize()));
-
-				//---- tfQueueLength ----
-				tfQueueLength.setText("6");
-				panel2.add(tfQueueLength);
-				tfQueueLength.setBounds(270, 20, 90, tfQueueLength.getPreferredSize().height);
-
-				//---- label9 ----
-				label9.setText("\u6b65\u8fdb\u95f4\u9694");
-				panel2.add(label9);
-				label9.setBounds(new Rectangle(new Point(20, 60), label9.getPreferredSize()));
-
-				//---- tfStepTime ----
-				tfStepTime.setText("36");
-				panel2.add(tfStepTime);
-				tfStepTime.setBounds(95, 55, 75, tfStepTime.getPreferredSize().height);
-
-				//---- label10 ----
-				label10.setText("\u5237\u65b0\u95f4\u9694");
-				panel2.add(label10);
-				label10.setBounds(new Rectangle(new Point(200, 60), label10.getPreferredSize()));
-
-				//---- tfRefreshTime ----
-				tfRefreshTime.setText("200000");
-				panel2.add(tfRefreshTime);
-				tfRefreshTime.setBounds(270, 55, 90, tfRefreshTime.getPreferredSize().height);
-
-				//---- label11 ----
-				label11.setText("\u5f39\u5e55\u4ea7\u751f\u901f\u5ea6");
-				panel2.add(label11);
-				label11.setBounds(new Rectangle(new Point(20, 90), label11.getPreferredSize()));
+				label7.setText("\u63a8\u9001\u95f4\u9694(s)");
+				debugPanel.add(label7);
+				label7.setBounds(0, 5, 84, 18);
 
 				//---- tfPushTime ----
 				tfPushTime.setText("1000");
-				panel2.add(tfPushTime);
-				tfPushTime.setBounds(120, 85, 240, tfPushTime.getPreferredSize().height);
+				debugPanel.add(tfPushTime);
+				tfPushTime.setBounds(90, 0, 105, 24);
 			}
-			mainWindowContentPane.add(panel2);
-			panel2.setBounds(40, 325, 485, 140);
+			mainWindowContentPane.add(debugPanel);
+			debugPanel.setBounds(55, 351, 200, 32);
 
-			mainWindowContentPane.setPreferredSize(new Dimension(570, 580));
+			mainWindowContentPane.setPreferredSize(new Dimension(555, 435));
 			mainWindow.pack();
-			mainWindow.setLocationRelativeTo(mainWindow.getOwner());
+			mainWindow.setLocationRelativeTo(null);
 		}
 		// //GEN-END:initComponents
 	}
@@ -545,6 +529,7 @@ public class MainWindow {
 	private JMenuBar menuBar1;
 	private JMenu menu1;
 	private JMenuItem setting;
+	private JCheckBoxMenuItem cbDebug;
 	private JMenu menu2;
 	private JMenuItem menuItemHelp;
 	private JMenuItem menuItemUpdate;
@@ -567,18 +552,35 @@ public class MainWindow {
 	private JButton button2;
 	private JButton run;
 	private JLabel label6;
-	private JPanel panel2;
+	private JPanel debugPanel;
 	private JLabel label7;
-	private JTextField tfStep;
-	private JLabel label8;
-	private JTextField tfQueueLength;
-	private JLabel label9;
-	private JTextField tfStepTime;
-	private JLabel label10;
-	private JTextField tfRefreshTime;
-	private JLabel label11;
 	private JTextField tfPushTime;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
+	@Override
+	public void save() {
+		if (bean == null) {
+			throw new NullPointerException("NULL BEANS");
+		}
+		if ( heartBeat.getText().trim().length() <=0) {
+			JOptionPane.showMessageDialog(_window, "缺项！");
+		}
+		try{
+			bean.setFontFace(cbFont.getSelectedItem());
+			bean.setFontSize(cbSize.getSelectedItem());
+			bean.setServerAddress(textServer.getText().trim());
+			bean.setHeartbeat(heartBeat.getText().trim());
+		}catch(Exception e){
+			JOptionPane.showMessageDialog(_window, "检查您输入的信息是否正确！");
+		}
+		ProgramUtils.exit(111, bean);
+		JOptionPane.showMessageDialog(_window, "保存成功");
+	}
+
+	@Override
+	public void saveFlush() {
+		initOtherComponents();
+		
+	}
 
 
 }

@@ -13,7 +13,7 @@ public class SettingValuesBeans {
 	private String heartbeat = "3";
 	private String fontFace = "黑体";
 	private String fontSize = "48";
-	private String color    = "RED";
+	private String color    = "#FF0000";
 	private String step = "6";
 	private String stepTime = "36";
 	private String queueLength = "6";

@@ -1,11 +1,10 @@
 package utils;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Properties;
 
 import beans.SettingValuesBeans;
 
@@ -34,6 +33,25 @@ public class ProgramUtils {
 			System.err.println("保存");
 		}
 
+	}
+	/**
+	 * 让JTextField只输入数字
+	 * a JTextField Component input number only. 
+	 * @author Hafrans
+	 *
+	 */
+	public static class NumberInputValidator extends KeyAdapter{
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+			if(e.getKeyChar() >= '0' && e.getKeyChar() <= '9'){
+				super.keyReleased(e);
+			}else{
+				e.consume();
+			}
+			
+		}
+		
 	}
 
 }
