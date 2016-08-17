@@ -15,6 +15,7 @@ import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
 import beans.SettingValuesBeans;
+import net.HSMTP;
 import utils.ScreenUtils;
 
 @SuppressWarnings("serial")
@@ -33,6 +34,7 @@ public class Barrage extends JWindow {
 	private String server = null;
 	private static Barrage obj = null;
 	private boolean isDebug = false;
+	private HSMTP hsmtp = null;
 
 	public Barrage(int queueMaxSize, int step) {
 		if (step * queueMaxSize == 0)
@@ -90,6 +92,7 @@ public class Barrage extends JWindow {
 			this.textSize = Integer.parseInt(bean.getFontSize());
 			this.color = Color.decode(bean.getColor());
 			this.server = bean.getServerAddress();
+			hsmtp = new HSMTP(server, "DAMA", false);
 			
 		}catch (NumberFormatException e) {
 			throw new NumberFormatException("set is invalid");
