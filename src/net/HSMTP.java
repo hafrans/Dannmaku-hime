@@ -64,10 +64,10 @@ public class HSMTP {
 		PrintWriter pw = new PrintWriter(new BufferedOutputStream(conn.getOutputStream()), true);
 		pw.write(menctyped);
 		pw.close();
-		
 		//后接受
 		BufferedReader read = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
 		String a =  read.readLine();
+		System.err.println("GET : "+a);
 		if(a.startsWith("{")){
 			JSONObject object = new JSONObject(a);
 			object.getString("err_msg");

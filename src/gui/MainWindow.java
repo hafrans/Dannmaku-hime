@@ -77,6 +77,7 @@ public class MainWindow implements Saveable {
 				cbFont.setSelectedItem(bean.getFontFace());
 				cbSize.setSelectedItem(bean.getFontSize());
 				textServer.setText(bean.getServerAddress());
+				testText.setForeground(Color.decode(bean.getColor()));
 			}
 		});
 
@@ -215,7 +216,7 @@ public class MainWindow implements Saveable {
 				System.out.println("Debug start");
 			}else{
 				try{
-					_obj = new Barrage(bean);
+					_obj = new Barrage(bean,this);
 				}catch (NumberFormatException e1) {
 					JOptionPane.showMessageDialog(_window, "请检查的您的参数配置是否有问题");
 					e1.printStackTrace();
@@ -329,7 +330,7 @@ public class MainWindow implements Saveable {
 		//======== mainWindow ========
 		{
 			mainWindow.setTitle("\u5f39\u5e55\u59ec");
-			mainWindow.setVisible(true);
+			//mainWindow.setVisible(true);
 			mainWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 			mainWindow.setForeground(Color.darkGray);
 			mainWindow.setIconImage(((ImageIcon) UIManager.getIcon("FileView.computerIcon")).getImage());
@@ -401,7 +402,7 @@ public class MainWindow implements Saveable {
 			label1.setBounds(30, 55, 75, 18);
 
 			//---- textServer ----
-			textServer.setText("http://api.hafrans.com/barrage/api.php?action=gettext&privilege=public");
+			textServer.setText("http://api.hafrans.com/dannmaku/getmsg.php");
 			mainWindowContentPane.add(textServer);
 			textServer.setBounds(115, 50, 385, 24);
 
@@ -501,6 +502,7 @@ public class MainWindow implements Saveable {
 
 			//======== debugPanel ========
 			{
+				debugPanel.setVisible(false);
 				debugPanel.setLayout(null);
 
 				//---- label7 ----

@@ -6,7 +6,7 @@
 <entry key="heart">3</entry>
 <entry key="step-time">36</entry>
 <entry key="color">#FF0066</entry>
-<entry key="server-address">2134</entry>
+<entry key="server-address">http://api.hafrans.com/dannmaku/getmsg.php</entry>
 <entry key="step">6</entry>
 <entry key="queue-length">6</entry>
 <entry key="font-size">48</entry>

@@ -4,6 +4,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -75,14 +76,15 @@ public class ProgramUtils {
 	 * @param text
 	 * @return MD5串
 	 * @throws NoSuchAlgorithmException
+	 * @throws UnsupportedEncodingException 
 	 */
-	public static String md5String(String text) throws NoSuchAlgorithmException {
+	public static String md5String(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		MessageDigest md5 = MessageDigest.getInstance("md5");
-		md5.update(text.getBytes());
+		md5.update(text.getBytes("UTF-8"));
 		StringBuilder sb = new StringBuilder();
 		byte[] result = md5.digest();
 		for (byte b : result) {
-			sb.append(Integer.toHexString(b & 0xff));
+			sb.append(String.format("%02x", b&0xff));
 		}
 		return sb.toString();
 	}

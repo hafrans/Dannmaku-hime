@@ -3,8 +3,11 @@ package gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.TrayIcon.MessageType;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -14,12 +17,16 @@ import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
+import org.json.JSONException;
+
 import beans.SettingValuesBeans;
 import net.HSMTP;
+import net.HSMTPException;
 import utils.ScreenUtils;
 
 @SuppressWarnings("serial")
 public class Barrage extends JWindow {
+	private MainWindow window = null;
 	private Dimension screenSize = ScreenUtils.getScreenSize();
 	private double screenPercent = 0.5; // 屏占比
 	private final ConcurrentLinkedQueue<Integer> clq = new ConcurrentLinkedQueue<Integer>();
@@ -35,6 +42,7 @@ public class Barrage extends JWindow {
 	private static Barrage obj = null;
 	private boolean isDebug = false;
 	private HSMTP hsmtp = null;
+	private int heartBeat = 3;
 
 	public Barrage(int queueMaxSize, int step) {
 		if (step * queueMaxSize == 0)
@@ -80,10 +88,11 @@ public class Barrage extends JWindow {
 		
 
 	}
-	public Barrage(SettingValuesBeans bean){
+	public Barrage(SettingValuesBeans bean,MainWindow window){
 		if(bean == null){
 			throw new NullPointerException(" no input beans");
 		}
+		this.window = window;
 		try{
 			this.queueMaxSize = Integer.parseInt(bean.getQueueLength());
 			this.step = Integer.parseInt(bean.getStep());
@@ -92,6 +101,7 @@ public class Barrage extends JWindow {
 			this.textSize = Integer.parseInt(bean.getFontSize());
 			this.color = Color.decode(bean.getColor());
 			this.server = bean.getServerAddress();
+			this.heartBeat = Integer.parseInt(bean.getHeartbeat());
 			hsmtp = new HSMTP(server, "DAMA", false);
 			
 		}catch (NumberFormatException e) {
@@ -141,7 +151,7 @@ public class Barrage extends JWindow {
 							/**
 							 * 弹幕炸锅了
 							 */
-							if (clq.size() > queueMaxSize * 2) {
+							if (clq.size() > queueMaxSize * 1.5) {
 								clq.clear();
 								System.out.println("clear");
 							}
@@ -162,16 +172,65 @@ public class Barrage extends JWindow {
 
 	private void write() {
 
-		new Timer().schedule(new TimerTask() {
+		if(isDebug){
+			new Timer().schedule(new TimerTask() {
 
-			@Override
-			public void run() {
-				if (Barrage.this.isVisible()) {
-					writeBarrage("**您处于DEBUG模式**这是测试弹幕**[弾幕姫だんまくひめ]", fontface, String.valueOf(textSize),color);
-					System.out.println("测试");
+				@Override
+				public void run() {
+					if (Barrage.this.isVisible()) {
+						writeBarrage("**您处于DEBUG模式**这是测试弹幕**[弾幕姫だんまくひめ]", fontface, String.valueOf(textSize),color);
+						System.out.println("测试");
+					}
 				}
-			}
-		}, 500, pushTime);
+			}, 500, pushTime);
+		}else{
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+				
+				@Override
+				public void run() {
+					if(!Barrage.this.isVisible())
+						timer.cancel();
+					try {
+						List<String> list = hsmtp.openConnection();
+						
+						new Thread(new Runnable() {
+							
+							@Override
+							public void run() {
+								for(String obj : list){
+									if (Barrage.this.isVisible()) {
+										writeBarrage(obj, fontface, String.valueOf(textSize),color);
+										System.out.println(obj);
+									}
+									try {
+										Thread.sleep(150);
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+									}
+								}
+							}
+						}).start();
+						
+					} catch (JSONException e) {
+						if(Tray.icon != null)
+							Tray.icon.displayMessage("弹幕姬的提示", "您的弹幕姬在解析上出现了问题！", MessageType.ERROR);
+						timer.cancel();
+						e.printStackTrace();
+					} catch (IOException e) {
+						if(Tray.icon != null)
+							Tray.icon.displayMessage("弹幕姬的提示", "您的弹幕姬出现了故障！", MessageType.ERROR);
+						timer.cancel();
+						e.printStackTrace();
+					} catch (HSMTPException e) {
+						if(Tray.icon != null)
+							Tray.icon.displayMessage("弹幕姬的提示", "服务器故障："+e.getMessage(), MessageType.ERROR);
+						timer.cancel();
+						e.printStackTrace();
+					}
+				} 
+			}, 500, heartBeat*1000);
+		}
 
 	}
 

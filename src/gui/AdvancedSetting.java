@@ -26,6 +26,7 @@ public class AdvancedSetting implements Saveable {
 		this.window = window;
 		initComponents();
 		initOtherComponents();
+		adset.setVisible(true);
 	}
 
 	private void initOtherComponents() {
@@ -117,7 +118,7 @@ public class AdvancedSetting implements Saveable {
 		{
 			adset.setTitle("\u9ad8\u7ea7\u8bbe\u7f6e");
 			adset.setAlwaysOnTop(true);
-			adset.setVisible(true);
+			//adset.setVisible(true);
 			adset.setIconImage(((ImageIcon) UIManager.getIcon("FileView.computerIcon")).getImage());
 			adset.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			adset.setResizable(false);
@@ -288,7 +289,7 @@ public class AdvancedSetting implements Saveable {
 					label4.setBounds(new Rectangle(new Point(30, 25), label4.getPreferredSize()));
 
 					//---- comboBox1 ----
-					comboBox1.setModel(new DefaultComboBoxModel<>(new String[] { "HSDPv1.0" }));
+					comboBox1.setModel(new DefaultComboBoxModel<>(new String[] { "HSMTP 1.0" }));
 					comboBox1.setEnabled(false);
 					panel2.add(comboBox1);
 					comboBox1.setBounds(95, 20, 185, comboBox1.getPreferredSize().height);
@@ -314,7 +315,7 @@ public class AdvancedSetting implements Saveable {
 					label10.setBounds(15, 95, 75, 18);
 
 					//---- textServer ----
-					textServer.setText("http://api.hafrans.com/barrage/api.php?action=gettext&privilege=public");
+					textServer.setText("http://api.hafrans.com/dannmaku/getmsg.php");
 					panel2.add(textServer);
 					textServer.setBounds(95, 90, 350, 24);
 

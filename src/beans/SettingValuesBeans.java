@@ -9,7 +9,7 @@ import java.util.Properties;
 
 public class SettingValuesBeans {
 	private Properties pro = null;
-	private String serverAddress = "http://api.hafrans.com/api.php?action=barrage";
+	private String serverAddress = "http://api.hafrans.com/dannmaku/getmsg.php";
 	private String heartbeat = "3";
 	private String fontFace = "黑体";
 	private String fontSize = "48";
