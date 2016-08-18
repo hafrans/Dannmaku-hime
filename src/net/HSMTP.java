@@ -6,15 +6,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
-
 import org.json.*;
 
 import utils.ProgramUtils;
@@ -33,6 +29,7 @@ public class HSMTP {
 	private String serverAddress;
 	private String key;
 	private String enctyped;
+	@SuppressWarnings("unused")
 	private boolean ssl = false;
 
 	public HSMTP(String serverAddress,String key,boolean ssl) {
@@ -65,7 +62,11 @@ public class HSMTP {
 		PrintWriter pw = new PrintWriter(new BufferedOutputStream(conn.getOutputStream()), true);
 		pw.write(menctyped);
 		pw.close();
+		
 		//后接受
+		if(conn.getResponseCode() != 200){
+			throw new HSMTPException("连接失败:"+conn.getResponseCode());
+		}
 		BufferedReader read = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
 		String a =  read.readLine();
 		System.err.println("GET : "+a);
