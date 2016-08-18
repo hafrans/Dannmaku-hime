@@ -58,6 +58,7 @@ public class HSMTP {
 		conn.setRequestMethod("POST");
 		conn.setRequestProperty("Length", ""+menctyped.getBytes().length);
 		conn.setRequestProperty("Content-Type", "x-www-form-urlencoded");
+		conn.setRequestProperty("User-Agent", "HSMTP 1.0 / Lari Protocol is Submiter");
 		
 		//先发送
 		

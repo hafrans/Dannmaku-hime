@@ -30,7 +30,7 @@ public class MainWindow implements Saveable {
 	public boolean isLaunched = false;
 	public Barrage _obj = null;
 	public JFrame _window = null;
-	private String version = "0.9.6 Beta";
+	private String version = "0.9.7 Beta";
 	public static SettingValuesBeans bean = new SettingValuesBeans();
 	/**
 	 * 
