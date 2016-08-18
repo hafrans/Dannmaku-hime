@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-<comment>2016-08-17</comment>
+<comment>2016-08-18</comment>
 <entry key="font-face">黑体</entry>
 <entry key="heart">3</entry>
 <entry key="step-time">36</entry>
 <entry key="color">#FF0066</entry>
-<entry key="server-address">http://api.hafrans.com/dannmaku/getmsg.php</entry>
+<entry key="server-address">http://api.hafrans.com/dannmaku</entry>
 <entry key="step">6</entry>
-<entry key="queue-length">6</entry>
+<entry key="queue-length">8</entry>
 <entry key="font-size">48</entry>
 </properties>

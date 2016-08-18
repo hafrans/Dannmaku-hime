@@ -3,6 +3,8 @@ package gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.TrayIcon.MessageType;
 import java.io.IOException;
 import java.net.URI;
@@ -43,6 +45,7 @@ public class Barrage extends JWindow {
 	private boolean isDebug = false;
 	private HSMTP hsmtp = null;
 	private int heartBeat = 3;
+	private Image cacheImage = null;
 
 	public Barrage(int queueMaxSize, int step) {
 		if (step * queueMaxSize == 0)
@@ -120,52 +123,42 @@ public class Barrage extends JWindow {
 		// this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.setAlwaysOnTop(true);
 		this.setLocation(0, 25);
-
-		// 后台刷新线程
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					while (Barrage.this.isVisible()) {
-						TimeUnit.SECONDS.sleep(10);
-						Barrage.this.repaint(1, 0, 0, Barrage.this.getWidth(), Barrage.this.getHeight());
-					}
-
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}).start();
-
+		
+		this.setVisible(true);
+		
 		// 队列处理线程
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				try {
+				
+					System.out.println("Wait");
 					while (Barrage.this.isVisible()) {
-						if (clq.size() > queueMaxSize * 0.8) {
-							clq.poll();
-							clq.poll();
-							/**
-							 * 弹幕炸锅了
-							 */
-							if (clq.size() > queueMaxSize * 1.5) {
-								clq.clear();
-								System.out.println("clear");
+						System.out.println("Wait");
+						try {
+							if (clq.size() > queueMaxSize) {
+								clq.poll();
+								/**
+								 * 弹幕炸锅了
+								 */
+								System.out.println("div");
+								if (clq.size() > queueMaxSize * 1.8) {
+									clq.clear();
+									System.out.println("clear");
+								}
+							} else {
+								System.out.println("Wait");
+								Thread.sleep(800);
 							}
-						} else {
-
-							TimeUnit.MILLISECONDS.sleep(1000);
+						} catch (Exception e) {
+							e.printStackTrace();
 						}
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				
 			}
 		}).start();
-		this.setVisible(true);
+		
+		
 		write();
 
 	}
@@ -300,5 +293,5 @@ public class Barrage extends JWindow {
 		return random;
 
 	}
-
+	
 }

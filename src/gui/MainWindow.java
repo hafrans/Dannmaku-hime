@@ -30,6 +30,7 @@ public class MainWindow implements Saveable {
 	public boolean isLaunched = false;
 	public Barrage _obj = null;
 	public JFrame _window = null;
+	private String version = "0.9.6 Beta";
 	public static SettingValuesBeans bean = new SettingValuesBeans();
 	/**
 	 * 
@@ -257,7 +258,7 @@ public class MainWindow implements Saveable {
 
 	private void aboutActionPerformed(ActionEvent e) {
 		JOptionPane.showMessageDialog(_window,
-				"弹幕姬 0.4 Alpha" + "\n\n" + "(c) 2016 T.C.A" + '\n' + "济南大学图灵电脑协会" + '\n' + "turing.com" + "\n\n"
+				"弹幕姬 "+version+ "\n\n" + "(c) 2016 T.C.A" + '\n' + "济南大学图灵电脑协会" + '\n' + "turing.com" + "\n\n"
 						+ "Client :" + '\n' + "(c) 2009-2016 Hafrans Stu." + '\n' + "hafrans.com",
 				"关于", JOptionPane.DEFAULT_OPTION);
 	}

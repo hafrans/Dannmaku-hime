@@ -43,7 +43,7 @@ public class HSMTP {
 	
 	public List<String> openConnection() throws IOException, JSONException, HSMTPException{
 		
-		URL url = new URL(serverAddress);
+		URL url = new URL(serverAddress+"/getmsg.php");
 		String timeStamp = String.valueOf(System.currentTimeMillis()/1000/10);
 		try {
 			enctyped = ProgramUtils.md5String(key+timeStamp);
