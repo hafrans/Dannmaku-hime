@@ -26,6 +26,7 @@ import utils.ProgramUtils;
 
 public class MainWindow implements Saveable {
 
+	@SuppressWarnings("unused")
 	private static final long serialVersionUID = 154518528548548L;
 	public boolean isLaunched = false;
 	public Barrage _obj = null;

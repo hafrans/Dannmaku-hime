@@ -132,22 +132,17 @@ public class Barrage extends JWindow {
 			@Override
 			public void run() {
 				
-					System.out.println("Wait");
 					while (Barrage.this.isVisible()) {
-						System.out.println("Wait");
 						try {
 							if (clq.size() > queueMaxSize) {
 								clq.poll();
 								/**
 								 * 弹幕炸锅了
 								 */
-								System.out.println("div");
 								if (clq.size() > queueMaxSize * 1.8) {
 									clq.clear();
-									System.out.println("clear");
 								}
 							} else {
-								System.out.println("Wait");
 								Thread.sleep(800);
 							}
 						} catch (Exception e) {
