@@ -22,6 +22,7 @@ http://api.hafrans.com/dannmaku
 您可以通过访问
 [http://api.hafrans.com/dannmaku/send.php](http://api.hafrans.com/dannmaku/send.php)来发送测试弹幕哦
 
+[IMG](http://ibytes.cn/wp-content/uploads/2016/08/QQ截图20160819205416.png)
 ___
 
 ###软件更新
